@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+body {
+  color: #0C0C0C;
+}
+
+.bg-primary-100 {
+  background: #05203C;
+}
+
+.bg-primary-100:hover {
+  background: #0C0C0C;
+}
+
+.text-primary-100 {
+  color: #007062;
+}
+
+.text-primary-200 {
+  color: #E70866;
+}
+
+.text-primary-300 {
+  color: #05203C;
+}
