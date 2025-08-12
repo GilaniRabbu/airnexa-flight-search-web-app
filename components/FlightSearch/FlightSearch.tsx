@@ -123,7 +123,7 @@ const FlightSearch = () => {
   return (
     <section className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 xl:px-10 py-10">
       <h1 className="text-3xl text-primary-300 font-bold tracking-tight mb-6">
-        Find Your Perfect Flight in AirNexa
+        Find Your Perfect <br className="block sm:hidden" /> Flight in AirNexa
       </h1>
 
       <SearchForm
