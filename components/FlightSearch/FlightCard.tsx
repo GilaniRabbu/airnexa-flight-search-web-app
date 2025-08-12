@@ -111,7 +111,11 @@ const FlightCard: React.FC<FlightCardProps> = ({
         ))}
       </div>
 
-      <button className="cursor-pointer w-full font-medium py-3 transition-all duration-300 text-white bg-primary-100">
+      <button
+        type="button"
+        aria-label="Select this flight"
+        className="cursor-pointer w-full font-medium py-3 transition-all duration-300 text-white bg-primary-100"
+      >
         Select Flight
       </button>
     </div>

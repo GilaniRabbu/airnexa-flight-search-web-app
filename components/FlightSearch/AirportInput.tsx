@@ -52,6 +52,7 @@ const AirportInput: React.FC<AirportInputProps> = ({
                 onChange(airport.iata);
                 setShowSuggestions(false);
               }}
+              role="option"
             >
               <div className="font-semibold">{airport.name}</div>
               <div className="font-medium">

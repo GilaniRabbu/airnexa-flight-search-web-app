@@ -66,6 +66,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
           <input
             type="date"
             id="departureDate"
+            aria-label="Departure date"
             value={departureDate}
             onChange={(e) => setDepartureDate(e.target.value)}
             min={new Date().toISOString().split("T")[0]}
@@ -77,9 +78,13 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-semibold mb-1">Adults</label>
+          <label htmlFor="adults" className="block text-sm font-semibold mb-1">
+            Adults
+          </label>
           <select
+            id="adults"
             value={adults}
+            aria-label="Number of adults"
             onChange={(e) => setAdults(parseInt(e.target.value))}
             className="w-full px-4 py-2 border border-slate-300 rounded-md outline-none"
           >
@@ -92,9 +97,16 @@ const SearchForm: React.FC<SearchFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-1">Children</label>
+          <label
+            htmlFor="children"
+            className="block text-sm font-semibold mb-1"
+          >
+            Children
+          </label>
           <select
+            id="children"
             value={children}
+            aria-label="Number of children"
             onChange={(e) => setChildren(parseInt(e.target.value))}
             className="w-full px-4 py-2 border border-slate-300 rounded-md outline-none"
           >
@@ -107,9 +119,16 @@ const SearchForm: React.FC<SearchFormProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-1">Class</label>
+          <label
+            htmlFor="travelClass"
+            className="block text-sm font-semibold mb-1"
+          >
+            Class
+          </label>
           <select
+            id="travelClass"
             value={travelClass}
+            aria-label="Travel class"
             onChange={(e) => setTravelClass(e.target.value)}
             className="w-full px-4 py-2 border border-slate-300 rounded-md outline-none"
           >
@@ -124,6 +143,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
       <button
         type="submit"
         disabled={loading}
+        aria-busy={loading}
         className="cursor-pointer w-full font-medium py-2 px-4 rounded-md transition-all duration-300 text-white bg-primary-100 disabled:opacity-50"
       >
         {loading ? "Searching..." : "Search Flights"}
