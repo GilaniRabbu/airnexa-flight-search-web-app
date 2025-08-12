@@ -1,11 +1,41 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { searchFlights, getAirportSuggestions } from "@/lib/amadeus";
 import SearchForm from "./SearchForm";
 import FlightCard from "./FlightCard";
 import LoadingSkeleton from "./LoadingSkeleton";
 import EmptyState from "./EmptyState";
 import Pagination from "./Pagination";
+
+const formatDuration = (duration: string) => {
+  const match = duration.match(/PT(\d+H)?(\d+M)?/);
+  if (!match) return duration;
+
+  const hours = match[1] ? `${match[1].replace("H", "")}h ` : "";
+  const minutes = match[2] ? `${match[2].replace("M", "")}m` : "";
+  return `${hours}${minutes}`;
+};
+
+const formatTime = (dateString: string) => {
+  return new Date(dateString).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const formatStops = (segments: any[]) => {
+  const stops = segments.length - 1;
+  if (stops === 0) return "Direct";
+  return `${stops} stop${stops > 1 ? "s" : ""}`;
+};
 
 const FlightSearch = () => {
   // Form state
@@ -24,41 +54,56 @@ const FlightSearch = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 4;
-  const indexOfLastResult = currentPage * resultsPerPage;
-  const indexOfFirstResult = indexOfLastResult - resultsPerPage;
-  const currentResults = results.slice(indexOfFirstResult, indexOfLastResult);
-  const totalPages = Math.ceil(results.length / resultsPerPage);
+  const indexOfLastResult = useMemo(
+    () => currentPage * resultsPerPage,
+    [currentPage]
+  );
+  const indexOfFirstResult = useMemo(
+    () => indexOfLastResult - resultsPerPage,
+    [indexOfLastResult]
+  );
+  const currentResults = useMemo(
+    () => results.slice(indexOfFirstResult, indexOfLastResult),
+    [results, indexOfFirstResult, indexOfLastResult]
+  );
+  const totalPages = useMemo(
+    () => Math.ceil(results.length / resultsPerPage),
+    [results]
+  );
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setResults([]); // Clear previous results immediately
-    setCurrentPage(1);
+  const handleSearch = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      setError("");
+      setResults([]);
+      setCurrentPage(1);
 
-    try {
-      const flightData = await searchFlights({
-        origin,
-        destination,
-        date: departureDate,
-        adults,
-        children,
-        travelClass,
-      });
+      try {
+        const flightData = await searchFlights({
+          origin,
+          destination,
+          date: departureDate,
+          adults,
+          children,
+          travelClass,
+        });
 
-      setResults(flightData.data || []);
-    } catch (err) {
-      setError(
-        "Failed to fetch flights. Please check your search criteria and try again."
-      );
-      setResults([]); // Ensure results are cleared on error
-    } finally {
-      setLoading(false);
-    }
-  };
+        setResults(flightData.data || []);
+      } catch (err) {
+        setError(
+          "Failed to fetch flights. Please check your search criteria and try again."
+        );
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [origin, destination, departureDate, adults, children, travelClass]
+  );
 
   // Reset handler
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setResults([]);
     setOrigin("");
     setDestination("");
@@ -68,42 +113,12 @@ const FlightSearch = () => {
     setTravelClass("ECONOMY");
     setCurrentPage(1);
     setError("");
-  };
+  }, []);
 
-  const formatDuration = (duration: string) => {
-    const match = duration.match(/PT(\d+H)?(\d+M)?/);
-    if (!match) return duration;
-
-    const hours = match[1] ? `${match[1].replace("H", "")}h ` : "";
-    const minutes = match[2] ? `${match[2].replace("M", "")}m` : "";
-    return `${hours}${minutes}`;
-  };
-
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const formatStops = (segments: any[]) => {
-    const stops = segments.length - 1;
-    if (stops === 0) return "Direct";
-    return `${stops} stop${stops > 1 ? "s" : ""}`;
-  };
-
-  const goToPage = (pageNumber: number) => {
+  const goToPage = useCallback((pageNumber: number) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
   return (
     <section className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 xl:px-10 py-10">
@@ -159,7 +174,7 @@ const FlightSearch = () => {
         ) : results.length > 0 ? (
           currentResults.map((offer, index) => (
             <FlightCard
-              key={index}
+              key={`${offer.id || index}_${currentPage}`}
               offer={offer}
               adults={adults}
               children={children}
